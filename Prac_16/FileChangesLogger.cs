@@ -20,6 +20,7 @@ namespace Prac_16
 
             watcher = new FileSystemWatcher(directoryToWatch);
 
+            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
             watcher.IncludeSubdirectories = true;
 
             watcher.Created += OnFileChanged;
@@ -35,7 +36,7 @@ namespace Prac_16
         /// <param name="e"></param>
         private void OnFileChanged(object sender, FileSystemEventArgs e)
         {
-            LogChange($"[{DateTime.Now}] {e.ChangeType} - {e.FullPath}");
+            LogChange($"{DateTime.Now} - {e.ChangeType} - {e.FullPath}");
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace Prac_16
         /// <param name="e"></param>
         private void OnFileRenamed(object sender, RenamedEventArgs e)
         {
-            LogChange($"[{DateTime.Now}] {e.ChangeType} - {e.OldFullPath} -> {e.FullPath}");
+            LogChange($"{DateTime.Now} - {e.ChangeType} - {e.OldFullPath} -> {e.FullPath}");
         }
 
         /// <summary>
@@ -56,7 +57,10 @@ namespace Prac_16
         {
             try
             {
-                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+                using (StreamWriter sw = File.AppendText(logFilePath))
+                {
+                    sw.WriteLine(logEntry);
+                }
             }
             catch (Exception ex)
             {
